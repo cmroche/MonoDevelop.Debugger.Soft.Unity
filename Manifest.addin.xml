@@ -1,17 +1,12 @@
 <Addin id = "MonoDevelop.Debugger.Soft.Unity"
        name	     = "Mono Soft Debugger Support for Unity"
        author	 = "Lucas Meijer"
-       url       = "http://github.com/Unity-Technologies/MonoDevelop.Debugger.Soft.Unity"
+       url       = "http://github.com/cmroche/MonoDevelop.Debugger.Soft.Unity"
        description = "Mono Soft Debugger Support for Unity"
        copyright   = "MIT X11"
        category = "Unity"
-       version   = "4.0-preview">
+       version   = "4.0">
        
-    <Runtime>
-		<Import assembly="Mono.Debugging.Soft.dll" />
-		<Import assembly="Mono.Debugger.Soft.dll" />
-	</Runtime>
-
 	<Dependencies>
 		<Addin id="MonoDevelop.Ide" version="4.0"/>
 		<Addin id="MonoDevelop.Core" version="4.0"/>
