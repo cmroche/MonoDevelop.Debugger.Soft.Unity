@@ -155,23 +155,39 @@ namespace MonoDevelop.Debugger.Soft.Unity
 		
 		protected override void OnAttachToProcess (long processId)
 		{
-			if (UnitySoftDebuggerEngine.UnityPlayers.ContainsKey ((uint)processId)) {
-				int port = (int)(56000 + (processId % 1000));
-				PlayerConnection.PlayerInfo player = UnitySoftDebuggerEngine.UnityPlayers[(uint)processId];
-				try {
-					StartConnecting (new SoftDebuggerStartInfo (new SoftDebuggerConnectArgs (player.m_Id, player.m_IPEndPoint.Address, (int)port)), 3, 1000);
-				} catch (Exception ex) {
-					throw new Exception (string.Format ("Unable to attach to {0}:{1}", player.m_IPEndPoint.Address, port), ex);
-				}
-				return;
-			}
-			base.OnAttachToProcess (processId);
+            if (UnitySoftDebuggerEngine.UnityPlayers.ContainsKey((uint)processId))
+            {
+                int port = (int)(56000 + (processId % 1000));
+                PlayerConnection.PlayerInfo player = UnitySoftDebuggerEngine.UnityPlayers [(uint)processId];
+                try
+                {
+                    StartConnecting(new SoftDebuggerStartInfo(new SoftDebuggerConnectArgs(player.m_Id, player.m_IPEndPoint.Address, (int)port)), 3, 1000);
+                } catch (Exception ex)
+                {
+                    throw new Exception(string.Format("Unable to attach to Unity Player process {0}:{1}", player.m_IPEndPoint.Address, port), ex);
+                }
+            } 
+
+            else
+            {
+                long port = 56000 + (processId % 1000);
+                try
+                {
+                    StartConnecting(new SoftDebuggerStartInfo(new SoftDebuggerConnectArgs("Unity", IPAddress.Loopback, (int)port)), 3, 1000);
+                } catch (Exception ex)
+                {
+                    throw new Exception(string.Format("Unable to attach to Unity Editor process on port {1}", port), ex);
+                }
+            }
+
+            return;
 		}
 
 		protected override void OnDetach()
 		{
 			try {
-				base.OnDetach();
+                //VirtualMachine.Disconnect();
+                VirtualMachine.Detach();
 			} catch (ObjectDisposedException) {
 			} catch (VMDisconnectedException) {
 			} catch (NullReferenceException) {
