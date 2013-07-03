@@ -5,11 +5,11 @@
     <target-gtk-version>2.12</target-gtk-version>
   </configuration>
   <import>
-    <widget-library name="../../../mono-repo/monodevelop/main/build/bin/Mono.TextEditor.dll" />
-    <widget-library name="MonoDevelop.Debugger.Soft, Version=2.4.0.0, Culture=neutral" />
-    <widget-library name="MonoDevelop.Debugger, Version=2.4.0.0, Culture=neutral" />
-    <widget-library name="../../../mono-repo/monodevelop/main/build/bin/MonoDevelop.Ide.dll" />
-    <widget-library name="../../../mono-repo/monodevelop/main/build/AddIns/MonoDevelop.Debugger.Soft.Unity.dll" internal="true" />
+    <widget-library name="../../monodevelop/main/build/AddIns/MonoDevelop.Debugger.Soft/MonoDevelop.Debugger.Soft.dll" />
+    <widget-library name="../../monodevelop/main/build/AddIns/MonoDevelop.Debugger/MonoDevelop.Debugger.dll" />
+    <widget-library name="../../monodevelop/main/build/bin/Mono.TextEditor.dll" />
+    <widget-library name="../../monodevelop/main/build/bin/MonoDevelop.Ide.dll" />
+    <widget-library name="../../MonoDevelop/main/build/AddIns/MonoDevelop.Debugger.Soft.Unity/MonoDevelop.Debugger.Soft.Unity.dll" internal="true" />
   </import>
   <widget class="Gtk.Bin" id="MonoDevelop.Debugger.Soft.Unity.GeneralOptionsPanel" design-size="300 300">
     <property name="MemberName" />
