@@ -40,5 +40,15 @@
 		<StockIcon stockid = "unity-icon-24" resource = "MonoDevelop.Debugger.Soft.Unity.icons.unity-icon-24.png" />
 	</Extension>
 	
+	<Extension path = "/MonoDevelop/Ide/CommandBar">
+		<ItemSet id = "Debug">
+			<CommandItem id = "MonoDevelop.Debugger.DebugCommands.Continue" />
+			<CommandItem id = "MonoDevelop.Debugger.DebugCommands.Pause" />						
+			<CommandItem id = "MonoDevelop.Debugger.DebugCommands.StepOver" />
+			<CommandItem id = "MonoDevelop.Debugger.DebugCommands.StepInto" />
+			<CommandItem id = "MonoDevelop.Debugger.DebugCommands.StepOut" />	
+		</ItemSet>
+	</Extension>
+	
 </Addin>
 
