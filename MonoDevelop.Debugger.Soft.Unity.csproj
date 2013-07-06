@@ -59,6 +59,7 @@
     <Reference Include="Mono.Posix" />
     <Reference Include="Mono.Debugger.Soft">
       <HintPath>..\monodevelop\main\build\AddIns\MonoDevelop.Debugger.Soft\Mono.Debugger.Soft.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MonoDevelop.Debugger.Soft">
       <HintPath>..\monodevelop\main\build\AddIns\MonoDevelop.Debugger.Soft\MonoDevelop.Debugger.Soft.dll</HintPath>
