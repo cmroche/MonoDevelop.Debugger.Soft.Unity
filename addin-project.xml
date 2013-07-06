@@ -1,0 +1,7 @@
+<AddinProject appVersion="4.0">
+	<Project platforms="Mac Linux Win32">
+		<AddinFile>bin/Debug/UnityUtilities.dll</AddinFile>
+		<BuildFile>MonoDevelop.Debugger.Soft.Unity.sln</BuildFile>
+		<BuildConfiguration>Debug</BuildConfiguration>
+	</Project>
+</AddinProject>
