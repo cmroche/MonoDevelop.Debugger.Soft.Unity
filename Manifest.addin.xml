@@ -1,9 +1,9 @@
 <Addin id = "MonoDevelop.Debugger.Soft.Unity"
        name	     = "Mono Soft Debugger Support for Unity"
-       author	 = "Lucas Meijer"
+       author	 = "Clifford Roche based on work from Lucas Meijer and others"
        url       = "http://github.com/cmroche/MonoDevelop.Debugger.Soft.Unity"
        description = "Mono Soft Debugger Support for Unity"
-       copyright   = "MIT X11"
+       copyright   = "MIT/X11"
        category = "Unity"
        version   = "4.0">
        
