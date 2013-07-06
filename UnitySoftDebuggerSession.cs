@@ -146,7 +146,7 @@ namespace MonoDevelop.Debugger.Soft.Unity
 			unityprocess = null;
 		}
 		
-		protected string GetConnectingMessage (DebuggerStartInfo dsi)
+		protected override string GetConnectingMessage (DebuggerStartInfo dsi)
 		{
 			Ide.DispatchService.GuiDispatch (() => {
 				Ide.IdeApp.Workbench.CurrentLayout = "Debug";
