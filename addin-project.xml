@@ -1,4 +1,4 @@
-<AddinProject appVersion="4.0">
+<AddinProject appVersion="4.1">
 	<Project platforms="Mac Linux Win32">
 		<AddinFile>bin/Debug/UnityUtilities.dll</AddinFile>
 		<BuildFile>MonoDevelop.Debugger.Soft.Unity.sln</BuildFile>
