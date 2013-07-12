@@ -2,7 +2,7 @@
        name	     = "Utilities for use with Unity"
        author	 = "Clifford Roche, Levi Bard"
        url       = "http://github.com/cmroche/MonoDevelop.Debugger.Soft.Unity"
-       description = "Utilities for use with Unity"
+       description = "This addin adds support for shaderlab, cginc, and glsl syntax highlighting. Easy access to Unity Script Reference, and Unity behaviour templates."
        copyright   = "MIT/X11"
        category = "Unity"
        version   = "4.0">
