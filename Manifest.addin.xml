@@ -1,17 +1,17 @@
 <Addin id = "MonoDevelop.Debugger.Soft.Unity"
        name	     = "Mono Soft Debugger Support for Unity"
-       author	 = "Lucas Meijer"
-       url       = "http://github.com/Unity-Technologies/MonoDevelop.Debugger.Soft.Unity"
+       author	 = "Clifford Roche based on work from Lucas Meijer and others"
+       url       = "http://github.com/cmroche/MonoDevelop.Debugger.Soft.Unity"
        description = "Mono Soft Debugger Support for Unity"
-       copyright   = "MIT X11"
+       copyright   = "MIT/X11"
        category = "Unity"
-       version   = "4.2">
-
+       version   = "4.0">
+       
 	<Dependencies>
-		<Addin id="MonoDevelop.Ide" version="3.1"/>
-		<Addin id="MonoDevelop.Core" version="3.1"/>
-		<Addin id="MonoDevelop.Debugger" version="3.1"/>
-		<Addin id="MonoDevelop.Debugger.Soft" version="3.1"/>
+		<Addin id="MonoDevelop.Ide" version="4.0"/>
+		<Addin id="MonoDevelop.Core" version="4.0"/>
+		<Addin id="MonoDevelop.Debugger" version="4.0"/>
+		<Addin id="MonoDevelop.Debugger.Soft" version="4.0"/>
 	</Dependencies>
 	
 	<Extension path="/MonoDevelop/Debugging/DebuggerEngines">
@@ -38,6 +38,16 @@
 	
 	<Extension path = "/MonoDevelop/Core/StockIcons">
 		<StockIcon stockid = "unity-icon-24" resource = "MonoDevelop.Debugger.Soft.Unity.icons.unity-icon-24.png" />
+	</Extension>
+	
+	<Extension path = "/MonoDevelop/Ide/CommandBar">
+		<ItemSet id = "Debug">
+			<CommandItem id = "MonoDevelop.Debugger.DebugCommands.Continue" />
+			<CommandItem id = "MonoDevelop.Debugger.DebugCommands.Pause" />						
+			<CommandItem id = "MonoDevelop.Debugger.DebugCommands.StepOver" />
+			<CommandItem id = "MonoDevelop.Debugger.DebugCommands.StepInto" />
+			<CommandItem id = "MonoDevelop.Debugger.DebugCommands.StepOut" />	
+		</ItemSet>
 	</Extension>
 	
 </Addin>

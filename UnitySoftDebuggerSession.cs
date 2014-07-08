@@ -60,7 +60,7 @@ namespace MonoDevelop.Debugger.Soft.Unity
 			Adaptor.BusyStateChanged += delegate(object sender, BusyStateEventArgs e) {
 				SetBusyState (e);
 			};
-			MonoDevelop.Ide.IdeApp.Exiting += (sender,args) => EndSession();
+			//MonoDevelop.Ide.IdeApp.Exiting += (sender,args) => EndSession();
 		}
 		
 		protected override void OnRun (DebuggerStartInfo startInfo)
@@ -119,9 +119,10 @@ namespace MonoDevelop.Debugger.Soft.Unity
 		protected override void EndSession ()
 		{
 			try {
-				Ide.DispatchService.GuiDispatch (() =>
-					Ide.IdeApp.Workbench.CurrentLayout = UnityProjectServiceExtension.EditLayout
-				);
+				Ide.DispatchService.GuiDispatch (() => {
+					Ide.IdeApp.Workbench.HideCommandBar ("Debug");
+					Ide.IdeApp.Workbench.CurrentLayout = UnityProjectServiceExtension.EditLayout;
+				});
 				EndUnityProcess ();
 				base.EndSession ();
 			} catch (Mono.Debugger.Soft.VMDisconnectedException) {
@@ -147,31 +148,53 @@ namespace MonoDevelop.Debugger.Soft.Unity
 		
 		protected override string GetConnectingMessage (DebuggerStartInfo dsi)
 		{
-			Ide.DispatchService.GuiDispatch (() =>
-				Ide.IdeApp.Workbench.CurrentLayout = "Debug"
-			);
+			Ide.DispatchService.GuiDispatch (() => {
+				Ide.IdeApp.Workbench.CurrentLayout = "Debug";
+			    Ide.IdeApp.Workbench.ShowCommandBar ("Debug");
+			});
 			return base.GetConnectingMessage (dsi);
 		}
 		
 		protected override void OnAttachToProcess (long processId)
 		{
-			if (UnitySoftDebuggerEngine.UnityPlayers.ContainsKey ((uint)processId)) {
-				int port = (int)(56000 + (processId % 1000));
-				PlayerConnection.PlayerInfo player = UnitySoftDebuggerEngine.UnityPlayers[(uint)processId];
-				try {
-					StartConnecting (new SoftDebuggerStartInfo (new SoftDebuggerConnectArgs (player.m_Id, player.m_IPEndPoint.Address, (int)port)), 3, 1000);
-				} catch (Exception ex) {
-					throw new Exception (string.Format ("Unable to attach to {0}:{1}", player.m_IPEndPoint.Address, port), ex);
-				}
-				return;
-			}
-			base.OnAttachToProcess (processId);
+            if (UnitySoftDebuggerEngine.UnityPlayers.ContainsKey((uint)processId))
+            {
+                int port = (int)(56000 + (processId % 1000));
+                PlayerConnection.PlayerInfo player = UnitySoftDebuggerEngine.UnityPlayers [(uint)processId];
+                try
+                {
+                    StartConnecting(new SoftDebuggerStartInfo(new SoftDebuggerConnectArgs(player.m_Id, player.m_IPEndPoint.Address, (int)port)), 3, 1000);
+                } catch (Exception ex)
+                {
+                    throw new Exception(string.Format("Unable to attach to Unity Player process {0}:{1}", player.m_IPEndPoint.Address, port), ex);
+                }
+            } 
+
+            else
+            {
+                long port = 56000 + (processId % 1000);
+                try
+                {
+                    StartConnecting(new SoftDebuggerStartInfo(new SoftDebuggerConnectArgs("Unity", IPAddress.Loopback, (int)port)), 3, 1000);
+                } catch (Exception ex)
+                {
+                    throw new Exception(string.Format("Unable to attach to Unity Editor process on port {1}", port), ex);
+                }
+            }
+
+            return;
 		}
 
 		protected override void OnDetach()
 		{
 			try {
-				base.OnDetach();
+				Ide.DispatchService.GuiDispatch (() => {
+					Ide.IdeApp.Workbench.HideCommandBar ("Debug");
+					Ide.IdeApp.Workbench.CurrentLayout = UnityProjectServiceExtension.EditLayout;
+				});
+
+                VirtualMachine.Disconnect();
+                VirtualMachine.Detach();
 			} catch (ObjectDisposedException) {
 			} catch (VMDisconnectedException) {
 			} catch (NullReferenceException) {
