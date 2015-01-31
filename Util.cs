@@ -56,6 +56,21 @@ namespace MonoDevelop.Debugger.Soft.Unity
 			get{ return PropertyService.Get (UnityLocationProperty, FindUnity ()); }
 			set{ PropertyService.Set (UnityLocationProperty, value); }
 		}
+
+		public static string UnityEditorDataFolder {
+			get {
+				var path = Path.GetDirectoryName(UnityLocation);
+				if (path == null)
+					return "";
+
+				if (Platform.IsMac)
+					return Path.GetDirectoryName(path);
+				else if (Platform.IsWindows)
+					return Path.Combine(path, "Data");
+				else
+					throw new Exception("Platform not supported");
+			}
+		}
 		
 		/// <summary>
 		/// Whether to automatically launch Unity

@@ -123,10 +123,6 @@ namespace MonoDevelop.Debugger.Soft.Unity
 			get; private set;
 		}
 		
-		public override string CommandString {
-			get{ return string.Empty; }
-		}
-		
 		#endregion
 	}
 }

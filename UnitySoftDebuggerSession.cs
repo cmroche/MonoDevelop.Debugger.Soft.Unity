@@ -49,12 +49,16 @@ namespace MonoDevelop.Debugger.Soft.Unity
 	/// </summary>
 	public class UnitySoftDebuggerSession : Mono.Debugging.Soft.SoftDebuggerSession
 	{
+		ConnectorRegistry connectorRegistry;
 		Process unityprocess;
 		string unityPath;
 		public const uint clientPort = 57432;
+		// Connector that was used to make connection for current session.
+		IUnityDbgConnector currentConnector;
 		
-		public UnitySoftDebuggerSession ()
+		public UnitySoftDebuggerSession (ConnectorRegistry connectorRegistry)
 		{
+			this.connectorRegistry = connectorRegistry;
 			unityPath = Util.UnityLocation;
 			
 			Adaptor.BusyStateChanged += delegate(object sender, BusyStateEventArgs e) {
@@ -155,9 +159,15 @@ namespace MonoDevelop.Debugger.Soft.Unity
 		
 		protected override void OnAttachToProcess (long processId)
 		{
-			if (UnitySoftDebuggerEngine.UnityPlayers.ContainsKey ((uint)processId)) {
-				int port = (int)(56000 + (processId % 1000));
+			if (connectorRegistry.Connectors.ContainsKey((uint)processId)) {
+				currentConnector = connectorRegistry.Connectors[(uint)processId];
+				StartConnecting(currentConnector.SetupConnection(), 3, 1000);
+				return;
+			} else if (UnitySoftDebuggerEngine.UnityPlayers.ContainsKey ((uint)processId)) {
 				PlayerConnection.PlayerInfo player = UnitySoftDebuggerEngine.UnityPlayers[(uint)processId];
+				int port = (0 == player.m_DebuggerPort
+					? (int)(56000 + (processId % 1000))
+					: (int)player.m_DebuggerPort);
 				try {
 					StartConnecting (new SoftDebuggerStartInfo (new SoftDebuggerConnectArgs (player.m_Id, player.m_IPEndPoint.Address, (int)port)), 3, 1000);
 				} catch (Exception ex) {
@@ -175,6 +185,11 @@ namespace MonoDevelop.Debugger.Soft.Unity
 			} catch (ObjectDisposedException) {
 			} catch (VMDisconnectedException) {
 			} catch (NullReferenceException) {
+			}
+
+			if (currentConnector != null) {
+				currentConnector.OnDisconnect();
+				currentConnector = null;
 			}
 		}
 	}

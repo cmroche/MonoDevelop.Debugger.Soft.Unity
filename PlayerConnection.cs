@@ -43,11 +43,11 @@ namespace MonoDevelop.Debugger.Soft.Unity
 	/// </summary>
 	public class PlayerConnection
 	{
-		public const int PLAYER_MULTICAST_PORT = 54997;
+		public static readonly int[] PLAYER_MULTICAST_PORTS = new[]{ 54997, 34997, 57997, 58997 };
 		public const string PLAYER_MULTICAST_GROUP = "225.0.0.222";
 		public const int MAX_LAST_SEEN_ITERATIONS = 3;
 		
-		private Socket m_MulticastSocket = null;
+		private List<Socket> m_MulticastSockets = null;
 		private Dictionary<string,int> m_AvailablePlayers = new Dictionary<string,int>();
 		
 		public IEnumerable<string> AvailablePlayers {
@@ -65,11 +65,12 @@ namespace MonoDevelop.Debugger.Soft.Unity
 			public Int32 m_Version;
 			public string m_Id;
 			public bool m_AllowDebugging;
+			public UInt32 m_DebuggerPort;
 			
 			public override string ToString ()
 			{
-				return string.Format ("PlayerInfo {0} {1} {2} {3} {4} {5} {6} {7}", m_IPEndPoint.Address, m_IPEndPoint.Port,
-									  m_Flags, m_Guid, m_EditorGuid, m_Version, m_Id, m_AllowDebugging? 1: 0);
+				return string.Format ("PlayerInfo {0} {1} {2} {3} {4} {5} {6}:{7} {8}", m_IPEndPoint.Address, m_IPEndPoint.Port,
+									  m_Flags, m_Guid, m_EditorGuid, m_Version, m_Id, m_DebuggerPort, m_AllowDebugging? 1: 0);
 			}
 			
 			public static PlayerInfo Parse(string playerString)
@@ -77,9 +78,10 @@ namespace MonoDevelop.Debugger.Soft.Unity
 				PlayerInfo res = new PlayerInfo();
 				
 				try {
-					// "[IP] %s [Port] %u [Flags] %u [Guid] %u [EditorId] %u [Version] %d [Id] %s"
+					// "[IP] %s [Port] %u [Flags] %u [Guid] %u [EditorId] %u [Version] %d [Id] %s(:d) [Debug] %d"
 					Regex r = new Regex("\\[IP\\] (?<ip>.*) \\[Port\\] (?<port>.*) \\[Flags\\] (?<flags>.*)" +
-										" \\[Guid\\] (?<guid>.*) \\[EditorId\\] (?<editorid>.*) \\[Version\\] (?<version>.*) \\[Id\\] (?<id>.*) \\[Debug\\] (?<debug>.*)");
+										" \\[Guid\\] (?<guid>.*) \\[EditorId\\] (?<editorid>.*) \\[Version\\] (?<version>.*)" +
+										" \\[Id\\] (?<id>[^:]+)(:(?<debuggerPort>\\d+))? \\[Debug\\] (?<debug>.*)");
 					
 					MatchCollection matches = r.Matches(playerString);
 					
@@ -97,6 +99,8 @@ namespace MonoDevelop.Debugger.Soft.Unity
 					res.m_Version = Int32.Parse (matches[0].Groups["version"].Value);
 					res.m_Id = matches[0].Groups["id"].Value;
 					res.m_AllowDebugging= (0 != int.Parse (matches[0].Groups["debug"].Value));
+					if (matches[0].Groups["debuggerPort"].Success)
+						res.m_DebuggerPort = UInt32.Parse (matches[0].Groups["debuggerPort"].Value);
 					
 					System.Console.WriteLine(res.ToString());
 				} catch (Exception e) {
@@ -109,24 +113,30 @@ namespace MonoDevelop.Debugger.Soft.Unity
 		
 		public PlayerConnection ()
 		{
-			try
+			m_MulticastSockets = new List<Socket> ();
+			foreach (int port in PLAYER_MULTICAST_PORTS)
 			{
-				m_MulticastSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-				try { m_MulticastSocket.ExclusiveAddressUse = false; } catch (SocketException) {
-					// This option is not supported on some OSs
+				try
+				{
+					var multicastSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+					try { multicastSocket.ExclusiveAddressUse = false; }
+					catch (SocketException)
+					{
+						// This option is not supported on some OSs
+					}
+					multicastSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+					IPEndPoint ipep = new IPEndPoint(IPAddress.Any, port);
+					multicastSocket.Bind(ipep);
+
+					IPAddress ip = IPAddress.Parse(PLAYER_MULTICAST_GROUP);
+					multicastSocket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership,
+										new MulticastOption(ip, IPAddress.Any));
+					m_MulticastSockets.Add (multicastSocket);
 				}
-				m_MulticastSocket.SetSocketOption (SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-				IPEndPoint ipep = new IPEndPoint(IPAddress.Any, PLAYER_MULTICAST_PORT);
-				m_MulticastSocket.Bind(ipep);
-				
-				IPAddress ip=IPAddress.Parse(PLAYER_MULTICAST_GROUP);
-				m_MulticastSocket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, 
-									new MulticastOption(ip,IPAddress.Any));
-			}
-			catch
-			{
-				m_MulticastSocket = null;
-				throw;
+				catch
+				{
+					throw;
+				}
 			}
 		}
 		
@@ -136,15 +146,18 @@ namespace MonoDevelop.Debugger.Soft.Unity
 			foreach (string player in m_AvailablePlayers.Keys.ToList ()) {
 				--m_AvailablePlayers[player];
 			}
-			
-			while (m_MulticastSocket != null && m_MulticastSocket.Available > 0)
-			{ 
-				byte[] buffer = new byte[1024];
-				
-				int num = m_MulticastSocket.Receive(buffer);
-				string str = System.Text.Encoding.ASCII.GetString(buffer, 0, num);
-				
-				RegisterPlayer(str);
+
+			foreach (Socket socket in m_MulticastSockets)
+			{
+				while (socket != null && socket.Available > 0)
+				{
+					byte[] buffer = new byte[1024];
+
+					int num = socket.Receive(buffer);
+					string str = System.Text.Encoding.ASCII.GetString(buffer, 0, num);
+
+					RegisterPlayer(str);
+				}
 			}
 		}
 		
