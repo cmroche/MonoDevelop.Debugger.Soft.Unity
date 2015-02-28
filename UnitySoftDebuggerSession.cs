@@ -49,12 +49,16 @@ namespace MonoDevelop.Debugger.Soft.Unity
 	/// </summary>
 	public class UnitySoftDebuggerSession : Mono.Debugging.Soft.SoftDebuggerSession
 	{
+		ConnectorRegistry connectorRegistry;
 		Process unityprocess;
 		string unityPath;
 		public const uint clientPort = 57432;
+		// Connector that was used to make connection for current session.
+		IUnityDbgConnector currentConnector;
 		
-		public UnitySoftDebuggerSession ()
+		public UnitySoftDebuggerSession (ConnectorRegistry connectorRegistry)
 		{
+			this.connectorRegistry = connectorRegistry;
 			unityPath = Util.UnityLocation;
 			
 			Adaptor.BusyStateChanged += delegate(object sender, BusyStateEventArgs e) {
@@ -182,22 +186,30 @@ namespace MonoDevelop.Debugger.Soft.Unity
                 }
             }
 
+			base.OnAttachToProcess(processId);
             return;
 		}
 
 		protected override void OnDetach()
 		{
 			try {
-				Ide.DispatchService.GuiDispatch (() => {
-					Ide.IdeApp.Workbench.HideCommandBar ("Debug");
-					Ide.IdeApp.Workbench.CurrentLayout = UnityProjectServiceExtension.EditLayout;
-				});
+//				Ide.DispatchService.GuiDispatch (() => {
+//					Ide.IdeApp.Workbench.HideCommandBar ("Debug");
+//					Ide.IdeApp.Workbench.CurrentLayout = UnityProjectServiceExtension.EditLayout;
+//				});
+//
+//                VirtualMachine.Disconnect();
+//                VirtualMachine.Detach();
 
-                VirtualMachine.Disconnect();
-                VirtualMachine.Detach();
+				base.OnDetach();
 			} catch (ObjectDisposedException) {
 			} catch (VMDisconnectedException) {
 			} catch (NullReferenceException) {
+			}
+
+			if (currentConnector != null) {
+				currentConnector.OnDisconnect();
+				currentConnector = null;
 			}
 		}
 	}
