@@ -8,10 +8,10 @@
        version   = "5.0">
        
 	<Dependencies>
-		<Addin id="MonoDevelop.Ide" version="5.1"/>
-		<Addin id="MonoDevelop.Core" version="5.1"/>
-		<Addin id="MonoDevelop.Debugger" version="5.1"/>
-		<Addin id="MonoDevelop.Debugger.Soft" version="5.1"/>
+		<Addin id="MonoDevelop.Ide" />
+		<Addin id="MonoDevelop.Core" />
+		<Addin id="MonoDevelop.Debugger" />
+		<Addin id="MonoDevelop.Debugger.Soft" />
 	</Dependencies>
 	
 	<Extension path="/MonoDevelop/Debugging/DebuggerEngines">
