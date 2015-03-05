@@ -4,14 +4,14 @@
        url       = "http://github.com/cmroche/MonoDevelop.Debugger.Soft.Unity"
        description = "Mono Soft Debugger Support for Unity"
        copyright   = "MIT/X11"
-       category = "Unity"
+       category = "Debugging"
        version   = "5.0">
        
 	<Dependencies>
-		<Addin id="MonoDevelop.Ide" />
-		<Addin id="MonoDevelop.Core" />
-		<Addin id="MonoDevelop.Debugger" />
-		<Addin id="MonoDevelop.Debugger.Soft" />
+		<Addin id="MonoDevelop.Ide" version="5.0"/>
+		<Addin id="MonoDevelop.Core" version="5.0"/>
+		<Addin id="MonoDevelop.Debugger" version="5.0"/>
+		<Addin id="MonoDevelop.Debugger.Soft" version="5.0"/>
 	</Dependencies>
 	
 	<Extension path="/MonoDevelop/Debugging/DebuggerEngines">
