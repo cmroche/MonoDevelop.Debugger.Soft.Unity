@@ -4,7 +4,7 @@
        url       = "http://github.com/cmroche/MonoDevelop.Debugger.Soft.Unity"
        description = "Mono Soft Debugger Support for Unity"
        copyright   = "MIT/X11"
-       category = "Debugging"
+       category = "Unity"
        version   = "5.0">
        
 	<Dependencies>
